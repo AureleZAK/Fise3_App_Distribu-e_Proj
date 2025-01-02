@@ -1,16 +1,15 @@
 services:
   app:
-    image : openjdk:17-alpine
-    container_name: proj-app-distrib
+    image : docker-app-distrib:latest
+    build :
+      context: .
+    container_name : proj-app-distrib
     ports:
       - "8080:8080"
-    volumes:
-      - ./target:/app
-    command: mvn spring-boot:run
     depends_on:
       - db
     environment:
-        - SPRING_DATASOURCE_URL=jdbc:postgres://db:5432/appdistribproj
+        - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/appdistribproj
         - SPRING_DATASOURCE_USERNAME=appdistribuser
         - SPRING_DATASOURCE_PASSWORD=appdistribpass
         - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
@@ -23,11 +22,5 @@ services:
       POSTGRES_USER: appdistribuser
       POSTGRES_PASSWORD: appdistribpass
     ports:
-        - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-volumes:
-  postgres-data:
-    driver: local
+        - "5432"
 
