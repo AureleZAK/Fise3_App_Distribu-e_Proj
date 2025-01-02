@@ -25,11 +25,27 @@ L'application expose des API REST pour interagir avec les données des équipes 
 
 ## Configuration et démarrage du projet
 
-1. git clone https://github.com/AureleZAK/Fise3_App_Distribuee_Proj.git (ou git@github.com:AureleZAK/Fise3_App_Distribuee_Proj.git)
+### 1. Cloner le projet
 
-2. cd app/src/main/resources
+Clonez le projet en utilisant l'une des commandes suivantes :
 
-3. docker-compose up
+```bash
+git clone https://github.com/AureleZAK/Fise3_App_Distribuee_Proj.git
+```
+ou
+```bash
+git clone git@github.com:AureleZAK/Fise3_App_Distribuee_Proj.git
+```
+
+### 2. Se rendre dans le repertoire de l'application
+```bash
+cd app
+```
+
+### Démarrer l'application avec docker-compose
+```bash
+docker-compose up
+```
 
 Le docker-compose va créer et démarrer les conteneurs pour l'application et la base de données.
 L'application sera accessible sur **http://localhost:8080**.
@@ -41,25 +57,33 @@ L'application est générée de base avec 5 équipe et 7 joueurs définis dans l
 
 ## Utilisation de l'application 
 
-On peut attaquer notre api via un outil comme Postman par exemple
+Vous pouvez interagir avec l'API via des outils comme [Postman](https://www.postman.com/) ou [cURL](https://curl.se/).
 
-- Gestion des équipes :
+### Gestion des équipes :
   
-*GET http://localhost:8080/teams* Pour récuperer toutes les équipes
-*Get http://localhost:8080/teams/{id}* Pour récuperer les informations d'une équipe
-*POST http://localhost:8080/teams* Pour ajouter une équipe
-exemple :
-POST http://localhost:8080/teams
-{
-  "name": "FC Barcelona",
-  "sport": "Football",
-  "stadium": "Camp Nou",
-  "city": "Barcelona",
-  "coach": "Xavi Hernandez"
-}
+- **Récupérer toutes les équipes**  
+  `GET http://localhost:8080/teams`  
 
-*PUT http://localhost:8080/teams/{id}* Pour modifier une équipe
-exemple :
+- **Récupérer une équipe par ID**  
+  `GET http://localhost:8080/teams/{id}`  
+
+- **Ajouter une équipe**  
+  `POST http://localhost:8080/teams`  
+  Exemple de requête pour ajouter une nouvelle équipe :
+  ```json
+  POST http://localhost:8080/teams
+  {
+    "name": "FC Barcelona",
+    "sport": "Football",
+    "stadium": "Camp Nou",
+    "city": "Barcelona",
+    "coach": "Xavi Hernandez"
+  }
+  
+- **Modifier une équipe**
+`PUT http://localhost:8080/teams/{id}`
+Exemple de requête pour modifier une équipe :
+```json
 PUT http://localhost:8080/teams/1
 {
   "name": "FC Barcelona",
@@ -68,15 +92,23 @@ PUT http://localhost:8080/teams/1
   "city": "Barcelona",
   "coach": "**Nouveau Coach**"
 }
+```
 
-*POST http://localhost:8080/teams/{id}* Pour supprimer une équipe
+- **Supprimer une équipe**
+`POST http://localhost:8080/teams/{id}`
 
-- Gestion des joueurs :
-  
-*GET http://localhost:8080/players* Pour recupérer tous les joueurs
-*GET http://localhost:8080/players/{id}* Pour recuperer les informations d'un joueur
-*POST http://localhost:8080/players Pour ajouter un joueur
-exemple :
+### Gestion des joueurs :
+
+- **Récupérer tous les joueurs**  
+  `GET http://localhost:8080/players`  
+
+- **Récupérer un joueur par ID**  
+  `GET http://localhost:8080/players/{id}`  
+
+- **Ajouter un joueur**
+`POST http://localhost:8080/players`
+Exemple de requête pour un ajouter un nouveau joueur :
+```json
 POST http://localhost:8080/players
 {
   "firstName": "Lionel",
@@ -89,9 +121,12 @@ POST http://localhost:8080/players
   "team": { "id": 1 },
   "number": "10"
 }
+```
 
-*PUT http://localhost:8080/players/{id}* Pour modifier un joueur
-exemple :
+- **Modifier un joueur**
+`PUT http://localhost:8080/players/{id}`
+Exemple de requête pour modifier un joueur :
+```json
 PUT http://localhost:8080/players/1
 {
   "firstName": "Lionel",
@@ -104,6 +139,7 @@ PUT http://localhost:8080/players/1
   "team": { "id": 2 },
   "number": "**Nouveau numéro**"
 }
+```
 
-*POST http://localhost:8080/players/{id}* Pour supprimer un joueur
-
+- **Supprimer un joueur**
+`POST http://localhost:8080/players/{id}`
