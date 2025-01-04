@@ -40,15 +40,20 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Player createPlayer(Player player) {
-        if (player.getTeam() != null && player.getTeam().getId() != null) {
-            Team team = teamService.getTeamById(player.getTeam().getId());
-            player.setTeam(team);
-            team.addPlayers(player);
+        if (player.getTeam() != null) {
+            if (player.getTeam().getId() != null) {
+                Team team = teamService.getTeamById(player.getTeam().getId());
+                player.setTeam(team);
+                team.addPlayers(player);
+            } else {
+                throw new TeamNotFoundException();
+            }
         } else {
-            throw new TeamNotFoundException(player.getTeam().getId());
+            player.setTeam(null);
         }
         return this.playerRepository.save(player);
     }
+
 
     @Override
     public Player updatePlayer(Long id, Player player) {
@@ -62,11 +67,16 @@ public class PlayerServiceImpl implements PlayerService {
                     existingPlayer.setNumber(player.getNumber());
                     existingPlayer.setHeight(player.getHeight());
                     existingPlayer.setWeight(player.getWeight());
-                    if (existingPlayer.getTeam() != player.getTeam() && teamRepository.existsById(player.getTeam().getId())) {
-                        existingPlayer.getTeam().removePlayers(existingPlayer);
-                        existingPlayer.setTeam(player.getTeam());
-                    } else if (teamRepository.existsById(player.getTeam().getId())) {
-                        TeamNotFoundException teamNotFoundException = new TeamNotFoundException(player.getTeam().getId());
+                    if (existingPlayer.getTeam() != player.getTeam()) {
+                        if (existingPlayer.getTeam() != null)
+                            existingPlayer.getTeam().removePlayers(existingPlayer);
+                        if (player.getTeam() != null) {
+                            if (!teamRepository.existsById(player.getTeam().getId()))
+                                throw new TeamNotFoundException();
+                            existingPlayer.setTeam(player.getTeam());
+                            player.getTeam().addPlayers(existingPlayer);
+                        } else
+                            existingPlayer.setTeam(null);
                     }
                     return this.playerRepository.save(existingPlayer);
                 })
@@ -76,14 +86,17 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void deletePlayer(Long id) {
         if (this.playerRepository.existsById(id)) {
-            if (playerRepository.findById(id).get().getTeam() != null) {
-                teamService.getTeamById(playerRepository.findById(id).get().getTeam().getId()).removePlayers(playerRepository.findById(id).get());
+            Player player = playerRepository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
+            if (player.getTeam() != null) {
+                teamService.getTeamById(player.getTeam().getId()).removePlayers(player);
             }
             this.playerRepository.deleteById(id);
-        } else
+        } else {
             throw new PlayerNotFoundException(id);
-
+        }
     }
+
+
     @Override
     public Player savePlayer(Player player) {
         return this.playerRepository.save(player);

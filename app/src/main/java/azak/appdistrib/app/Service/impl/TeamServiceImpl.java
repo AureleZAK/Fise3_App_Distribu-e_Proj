@@ -4,12 +4,14 @@ import azak.appdistrib.app.Dao.PlayerRepository;
 import azak.appdistrib.app.Dao.TeamRepository;
 import azak.appdistrib.app.Domain.Player;
 import azak.appdistrib.app.Domain.Team;
+import azak.appdistrib.app.Exception.PlayerNotFoundException;
 import azak.appdistrib.app.Service.TeamService;
 import azak.appdistrib.app.Exception.TeamNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Transactional
@@ -18,6 +20,9 @@ public class TeamServiceImpl implements TeamService {
 
     @Autowired
     private TeamRepository teamRepository;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -28,15 +33,27 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional(readOnly = true)
     public Team getTeamById(Long id) {
-        return this.teamRepository.findById(id).orElseThrow(() -> new TeamNotFoundException(id));
+        return this.teamRepository.findById(id).orElseThrow(TeamNotFoundException::new);
     }
 
     @Override
     public Team createTeam(Team team) {
+        Team savedTeam = this.teamRepository.save(team);
         if (team.getPlayers() != null) {
-            team.getPlayers().forEach(player -> player.setTeam(team));
+            List<Player> players = new ArrayList<>(team.getPlayers());
+            players.forEach(player -> {
+                if (player.getId() != null) {
+                    if (this.playerRepository.existsById(player.getId())) {
+                        Player persistedPlayer = this.playerRepository.findById(player.getId()).get();
+                        persistedPlayer.setTeam(savedTeam);
+                    } else {
+                        throw new PlayerNotFoundException(player.getId());
+                    }
+                }
+            });
+            savedTeam.setPlayers(players);
         }
-        return this.teamRepository.save(team);
+        return this.teamRepository.save(savedTeam);
     }
 
     @Override
@@ -48,13 +65,22 @@ public class TeamServiceImpl implements TeamService {
                     existingTeam.setCoach(team.getCoach());
                     existingTeam.setSport(team.getSport());
                     existingTeam.setStadium(team.getStadium());
-                    if (team.getPlayers().equals(existingTeam.getPlayers())) {
-                        existingTeam.getPlayers().clear();
-                        existingTeam.getPlayers().addAll(team.getPlayers());
-                    }
-                    return this.teamRepository.save(existingTeam);
+                    List<Player> listPlayers = new ArrayList<>();
+                    List<Player> teamPlayers = new ArrayList<>(team.getPlayers());
+                    teamPlayers.forEach(player -> {
+                        if (player.getId() != null) {
+                            if (this.playerRepository.existsById(player.getId())) {
+                                this.playerRepository.findById(player.getId()).get().setTeam(existingTeam);
+                                listPlayers.add(this.playerRepository.findById(player.getId()).get());
+                            } else {
+                                throw new PlayerNotFoundException(player.getId());
+                            }
+                        }
+                    existingTeam.setPlayers(listPlayers);
+                    });
+                return this.teamRepository.save(existingTeam);
                 })
-                .orElseThrow(() -> new TeamNotFoundException(id));
+                .orElseThrow(TeamNotFoundException::new);
     }
 
     @Override
@@ -65,7 +91,7 @@ public class TeamServiceImpl implements TeamService {
             }
             this.teamRepository.deleteById(id);
     }   else
-            throw new TeamNotFoundException(id);
+            throw new TeamNotFoundException();
     }
 
     @Override

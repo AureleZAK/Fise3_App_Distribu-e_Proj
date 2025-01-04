@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,7 +15,7 @@ public class Team {
     private Long id;
 
     @JsonManagedReference
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team" )
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team")
     private List<Player> players;
 
     private String name;
@@ -28,6 +29,7 @@ public class Team {
     private String coach;
 
     public Team() {
+        this.players = new ArrayList<>();
     }
 
     public Long getId() {
@@ -42,14 +44,20 @@ public class Team {
         return players;
     }
 
-    public void addPlayers(Player players) {
-        this.players.add(players);
-        players.setTeam(this);
+    public void setPlayers(List<Player> players) {
+        this.players.forEach(player -> player.setTeam(null));
+        this.players = players;
+        players.forEach(player -> player.setTeam(this));
     }
 
-    public void removePlayers(Player players) {
-        this.players.remove(players);
-        players.setTeam(null);
+    public void addPlayers(Player player) {
+        this.players.add(player);
+        player.setTeam(this);
+    }
+
+    public void removePlayers(Player player) {
+        this.players.remove(player);
+        player.setTeam(null);
     }
 
     public String getName() {

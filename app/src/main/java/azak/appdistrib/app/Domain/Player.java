@@ -16,20 +16,20 @@ public class Player {
 
     private String nationality;
 
-    private String age;
+    private int age;
 
-    private String height;
+    private float height;
 
-    private String weight;
+    private float weight;
 
     private String sport;
 
     @JsonBackReference
-    @ManyToOne( fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "team_id")
     private Team team;
 
-    private String number;
+    private int number;
 
     public Player() {
     }
@@ -66,27 +66,27 @@ public class Player {
         this.nationality = nationality;
     }
 
-    public String getAge() {
+    public int getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(int age) {
         this.age = age;
     }
 
-    public String getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(String height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
-    public String getWeight() {
+    public float getWeight() {
         return weight;
     }
 
-    public void setWeight(String weight) {
+    public void setWeight(float weight) {
         this.weight = weight;
     }
 
@@ -106,11 +106,11 @@ public class Player {
         this.team = team;
     }
 
-    public String getNumber() {
+    public int getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(int number) {
         this.number = number;
     }
 }
