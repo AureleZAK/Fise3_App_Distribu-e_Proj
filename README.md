@@ -27,7 +27,7 @@ L'application expose des API REST pour interagir avec les données des équipes 
 
 La persistence du projet se fait sur une base de donnée PostgeSQL. La configuration de la base de données est faite dans le fichier application.properties.
 la base de données est accessible via *jdbc:postgresql://localhost:5432/appdistribproj*
-et on s'y connecte avec le nom : appdistribuser et le mot de passe : appdistribpass
+et on s'y connecte avec le nom : appdistribuser et le mot de passe : appdistribpass.
 Elle est connfigure en create-drop donc s'initialise et se detruit à chaque lancement.
 
 ## Configuration et démarrage du projet
