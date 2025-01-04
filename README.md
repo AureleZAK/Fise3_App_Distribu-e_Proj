@@ -42,8 +42,15 @@ git clone git@github.com:AureleZAK/Fise3_App_Distribuee_Proj.git
 cd app
 ```
 
-### Démarrer l'application avec docker-compose
+### 3. Construire le projet
+On utilise clean install pour utiliser la target dans le docker-compose
 ```bash
+mvn clean install
+```
+
+### Construire le docker et lancer l'application avec docker-compose
+```bash
+docker-compose build
 docker-compose up
 ```
 
@@ -54,6 +61,8 @@ PostgreSQL sera accessible sur **localhost:5432**.
 ## Initialisation de l'application
 
 L'application est générée de base avec 5 équipe et 7 joueurs définis dans la classe **DataInit**
+
+Au lancement de l'applicaiton, les tests unitaires des services et des controllers de Team et Player se lancent automatiquement
 
 ## Utilisation de l'application 
 
@@ -68,12 +77,14 @@ Vous pouvez interagir avec l'API via des outils comme [Postman](https://www.post
   `GET http://localhost:8080/teams/{id}`  
 
 - **Ajouter une équipe**  
-  `POST http://localhost:8080/teams`  
+  `POST http://localhost:8080/teams`
+  Attention, on peut ajouter à une équipe des joueurs ou pasais on ne peut pas indiquer des joueurs avec un ID qui n'existe pas
   Exemple de requête pour ajouter une nouvelle équipe :
   ```json
   POST http://localhost:8080/teams
   {
     "name": "FC Barcelona",
+    "players": [{"id": 1}, {"id": 7}],
     "sport": "Football",
     "stadium": "Camp Nou",
     "city": "Barcelona",
@@ -82,15 +93,17 @@ Vous pouvez interagir avec l'API via des outils comme [Postman](https://www.post
   
 - **Modifier une équipe**
 `PUT http://localhost:8080/teams/{id}`
+Attention, on peut ajouter à une équipe des joueurs ou pasais on ne peut pas indiquer des joueurs avec un ID qui n'existe pas
 Exemple de requête pour modifier une équipe :
 ```json
 PUT http://localhost:8080/teams/1
 {
-  "name": "FC Barcelona",
+  "name": "FC barcelona",
+  "players": [{"id": 8}, {"id": 7}],
   "sport": "Football",
   "stadium": "Camp Nou",
   "city": "Barcelona",
-  "coach": "**Nouveau Coach**"
+  "coach": "Xavi Hernandez"
 }
 ```
 
@@ -107,6 +120,7 @@ PUT http://localhost:8080/teams/1
 
 - **Ajouter un joueur**
 `POST http://localhost:8080/players`
+Attention, on peut ajouter un joueur sans équipe mais on ne peut pas indiquer une équipe avec un ID qui n'existe pas
 Exemple de requête pour un ajouter un nouveau joueur :
 ```json
 POST http://localhost:8080/players
@@ -125,6 +139,7 @@ POST http://localhost:8080/players
 
 - **Modifier un joueur**
 `PUT http://localhost:8080/players/{id}`
+Attention, on peut modifier un joueur sans équipe mais on ne peut pas indiquer une équipe avec un ID qui n'existe pas
 Exemple de requête pour modifier un joueur :
 ```json
 PUT http://localhost:8080/players/1
